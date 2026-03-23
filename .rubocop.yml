@@ -1,0 +1,11 @@
+plugins:
+  - rubocop-internal_affairs
+  - rubocop-guardrails
+
+AllCops:
+  NewCops: enable
+  SuggestExtensions: false
+
+Naming/FileName:
+  Exclude:
+    - lib/rubocop-guardrails.rb
