@@ -6,6 +6,10 @@ AllCops:
   NewCops: enable
   SuggestExtensions: false
 
+Metrics/BlockLength:
+  Exclude:
+    - spec/**/*
+
 Naming/FileName:
   Exclude:
     - lib/rubocop-guardrails.rb

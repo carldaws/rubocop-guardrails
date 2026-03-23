@@ -1,1 +1,5 @@
-# Default configuration for rubocop-guardrails cops
+Guardrails/RestfulActions:
+  Enabled: true
+  Description: 'Prevents non-RESTful controller actions.'
+  Include:
+    - 'app/controllers/**/*.rb'
