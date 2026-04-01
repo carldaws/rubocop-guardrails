@@ -1,3 +1,8 @@
+Guardrails/NoGuardClauses:
+  Enabled: true
+  Description: 'Discourages guard clauses (conditional early returns).'
+  MinMethodLength: 10
+
 Guardrails/NoServiceObjects:
   Enabled: true
   Description: 'Disallows service objects.'
