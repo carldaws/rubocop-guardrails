@@ -1,0 +1,68 @@
+# frozen_string_literal: true
+
+module RuboCop
+  module Cop
+    module Guardrails
+      # Detects non-RESTful route definitions.
+      #
+      # Routes should use `resources` and `resource` exclusively. When you
+      # need a custom action, extract a new resource rather than adding
+      # bare HTTP verb routes or `member`/`collection` blocks.
+      #
+      # @example
+      #   # bad
+      #   get '/posts/:id/publish', to: 'posts#publish'
+      #
+      #   resources :posts do
+      #     member do
+      #       get :publish
+      #     end
+      #   end
+      #
+      #   # good - extract a new resource
+      #   resources :posts do
+      #     resource :publication, only: :create
+      #   end
+      class RestfulRoutes < Base
+        MSG_VERB = 'Use `resources` or `resource` instead of bare HTTP verb routes.'
+        MSG_MEMBER = 'Use a new `resources` instead of `member` routes.'
+        MSG_COLLECTION = 'Use a new `resources` instead of `collection` routes.'
+
+        HTTP_VERBS = %i[get post put patch delete match].to_set.freeze
+
+        RESTRICT_ON_SEND = [*HTTP_VERBS, :member, :collection].freeze
+
+        # @!method route_draw_block?(node)
+        def_node_matcher :route_draw_block?, <<~PATTERN
+          (block (send (send (send (const nil? :Rails) :application) :routes) :draw) ...)
+        PATTERN
+
+        def on_send(node)
+          return unless inside_routes_draw?(node)
+
+          if HTTP_VERBS.include?(node.method_name)
+            return if inside_member_or_collection?(node)
+
+            add_offense(node.loc.selector, message: MSG_VERB)
+          elsif node.method_name == :member
+            add_offense(node.loc.selector, message: MSG_MEMBER)
+          elsif node.method_name == :collection
+            add_offense(node.loc.selector, message: MSG_COLLECTION)
+          end
+        end
+
+        private
+
+        def inside_routes_draw?(node)
+          node.each_ancestor(:block).any? { |block| route_draw_block?(block) }
+        end
+
+        def inside_member_or_collection?(node)
+          node.each_ancestor(:block).any? do |block|
+            block.send_node.method_name == :member || block.send_node.method_name == :collection
+          end
+        end
+      end
+    end
+  end
+end

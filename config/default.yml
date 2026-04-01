@@ -3,3 +3,9 @@ Guardrails/RestfulActions:
   Description: 'Prevents non-RESTful controller actions.'
   Include:
     - 'app/controllers/**/*.rb'
+Guardrails/RestfulRoutes:
+  Enabled: true
+  Description: 'Detects non-RESTful route definitions.'
+  Include:
+    - 'config/routes.rb'
+    - 'config/routes/**/*.rb'
