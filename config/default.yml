@@ -9,6 +9,12 @@ Guardrails/NoGuardClauses:
   Description: 'Discourages guard clauses (conditional early returns).'
   MinMethodLength: 10
 
+Guardrails/NoInlineAuthorization:
+  Enabled: true
+  Description: 'Flags inline authorization checks in controller actions.'
+  Include:
+    - 'app/controllers/**/*.rb'
+
 Guardrails/StandardAppDirectories:
   Enabled: true
   Description: 'Prevents non-standard directories under app/.'
