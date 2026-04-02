@@ -3,11 +3,20 @@ Guardrails/NoGuardClauses:
   Description: 'Discourages guard clauses (conditional early returns).'
   MinMethodLength: 10
 
-Guardrails/NoServiceObjects:
+Guardrails/StandardAppDirectories:
   Enabled: true
-  Description: 'Disallows service objects.'
+  Description: 'Prevents non-standard directories under app/.'
+  AllowedDirectories:
+    - channels
+    - controllers
+    - helpers
+    - jobs
+    - mailers
+    - mailboxes
+    - models
+    - views
   Include:
-    - 'app/services/**/*.rb'
+    - 'app/**/*.rb'
 
 Guardrails/RestfulActions:
   Enabled: true
