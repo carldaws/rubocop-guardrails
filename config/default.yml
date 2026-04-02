@@ -1,3 +1,10 @@
+Guardrails/ControllerInstanceVariables:
+  Enabled: true
+  Description: 'Flags controller actions with too many instance variables.'
+  Max: 1
+  Include:
+    - 'app/controllers/**/*.rb'
+
 Guardrails/ControllerTransaction:
   Enabled: true
   Description: 'Flags transaction blocks in controllers.'
