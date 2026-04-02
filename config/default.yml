@@ -21,6 +21,13 @@ Guardrails/NoTestStrings:
   Include:
     - 'test/**/*.rb'
 
+Guardrails/ShallowJob:
+  Enabled: true
+  Description: 'Flags job perform methods with too many statements.'
+  MaxStatements: 2
+  Include:
+    - 'app/jobs/**/*.rb'
+
 Guardrails/StandardAppDirectories:
   Enabled: true
   Description: 'Prevents non-standard directories under app/.'
