@@ -1,3 +1,9 @@
+Guardrails/ControllerTransaction:
+  Enabled: true
+  Description: 'Flags transaction blocks in controllers.'
+  Include:
+    - 'app/controllers/**/*.rb'
+
 Guardrails/NoGuardClauses:
   Enabled: true
   Description: 'Discourages guard clauses (conditional early returns).'
