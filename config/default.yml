@@ -15,6 +15,12 @@ Guardrails/NoInlineAuthorization:
   Include:
     - 'app/controllers/**/*.rb'
 
+Guardrails/NoTestStrings:
+  Enabled: true
+  Description: 'Prevents string literals in test assertions and finders.'
+  Include:
+    - 'test/**/*.rb'
+
 Guardrails/StandardAppDirectories:
   Enabled: true
   Description: 'Prevents non-standard directories under app/.'
