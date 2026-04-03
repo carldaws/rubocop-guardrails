@@ -13,3 +13,12 @@ Metrics/BlockLength:
 Naming/FileName:
   Exclude:
     - lib/rubocop-guardrails.rb
+
+Style/GuardClause:
+  Enabled: false
+
+Style/SafeNavigation:
+  Enabled: false
+
+Style/IfUnlessModifier:
+  Enabled: false

@@ -48,10 +48,9 @@ module RuboCop
 
         def on_class(node)
           dir = app_subdirectory
-          return unless dir
-          return if allowed_directories.include?(dir)
-
-          add_offense(node.loc.name, message: format(MSG, directory: dir))
+          if dir && !allowed_directories.include?(dir)
+            add_offense(node.loc.name, message: format(MSG, directory: dir))
+          end
         end
 
         private

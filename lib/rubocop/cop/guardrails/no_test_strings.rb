@@ -31,7 +31,8 @@ module RuboCop
       #   assert_equal I18n.t("flash.success"), flash[:notice]
       #   card = cards(:logo)
       class NoTestStrings < Base
-        MSG_ASSERTION = 'Avoid hardcoded strings in assertions. Assert against the source value, an i18n key, or a predicate.'
+        MSG_ASSERTION = 'Avoid hardcoded strings in assertions. ' \
+                        'Assert against the source value, an i18n key, or a predicate.'
         MSG_FINDER = 'Avoid finding records by string values. Use fixtures instead.'
 
         # Assertions where string arguments are part of the API
@@ -65,6 +66,7 @@ module RuboCop
             add_offense(node, message: MSG_FINDER) if any_string_hash_value?(node)
           end
         end
+        alias on_csend on_send
 
         private
 
@@ -78,14 +80,14 @@ module RuboCop
         end
 
         def any_string_argument?(node)
-          node.arguments.any? { |arg| arg.str_type? || arg.dstr_type? }
+          node.arguments.any? { |arg| arg.type?(:str, :dstr) }
         end
 
         def any_string_hash_value?(node)
           node.arguments.any? do |arg|
             next unless arg.hash_type?
 
-            arg.pairs.any? { |pair| pair.value.str_type? || pair.value.dstr_type? }
+            arg.pairs.any? { |pair| pair.value.type?(:str, :dstr) }
           end
         end
       end

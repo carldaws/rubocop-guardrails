@@ -47,8 +47,6 @@ module RuboCop
 
         def on_def(node)
           guards = leading_guard_clauses(node)
-          return if guards.empty?
-
           allowed = method_length(node) > min_method_length ? 1 : 0
 
           guards.drop(allowed).each { |guard| add_offense(guard) }
@@ -58,17 +56,22 @@ module RuboCop
         private
 
         def leading_guard_clauses(node)
-          return [] unless node.body
-
-          statements = node.body.begin_type? ? node.body.children : [node.body]
-          statements.take_while { |s| guard_clause?(s) }
+          if node.body
+            statements = node.body.begin_type? ? node.body.children : [node.body]
+            statements.take_while { |s| guard_clause?(s) }
+          else
+            []
+          end
         end
 
         def guard_clause?(node)
-          return false unless node.if_type?
+          node.if_type? &&
+            (one_armed_return?(node.if_branch, node.else_branch) ||
+              one_armed_return?(node.else_branch, node.if_branch))
+        end
 
-          (node.if_branch&.return_type? && node.else_branch.nil?) ||
-            (node.else_branch&.return_type? && node.if_branch.nil?)
+        def one_armed_return?(branch, other)
+          branch && branch.return_type? && other.nil?
         end
 
         def method_length(node)

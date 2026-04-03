@@ -34,20 +34,22 @@ module RuboCop
         MSG = 'Job `perform` has too many statements (%<count>d/%<max>d). Move logic to a model method.'
 
         def on_def(node)
-          return unless node.method_name == :perform
-
-          count = statement_count(node)
-          return if count <= max_statements
-
-          add_offense(node.loc.name, message: format(MSG, count: count, max: max_statements))
+          if node.method?(:perform)
+            count = statement_count(node)
+            if count > max_statements
+              add_offense(node.loc.name, message: format(MSG, count: count, max: max_statements))
+            end
+          end
         end
 
         private
 
         def statement_count(node)
-          return 0 unless node.body
-
-          node.body.begin_type? ? node.body.children.size : 1
+          if node.body
+            node.body.begin_type? ? node.body.children.size : 1
+          else
+            0
+          end
         end
 
         def max_statements

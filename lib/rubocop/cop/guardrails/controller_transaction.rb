@@ -30,11 +30,10 @@ module RuboCop
         MSG = 'Avoid transactions in controllers. Move business logic to a model method.'
 
         def on_block(node)
-          return unless node.method_name == :transaction
-
-          add_offense(node.send_node)
+          add_offense(node.send_node) if node.method?(:transaction)
         end
         alias on_numblock on_block
+        alias on_itblock on_block
       end
     end
   end

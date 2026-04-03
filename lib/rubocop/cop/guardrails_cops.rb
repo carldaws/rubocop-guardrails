@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative 'guardrails/visibility_helpers'
 require_relative 'guardrails/controller_instance_variables'
 require_relative 'guardrails/controller_transaction'
 require_relative 'guardrails/no_guard_clauses'

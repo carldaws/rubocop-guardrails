@@ -37,6 +37,8 @@ module RuboCop
       #     head :forbidden unless Current.user.can_administer?(@card)
       #   end
       class NoInlineAuthorization < Base
+        include VisibilityHelpers
+
         MSG = 'Extract authorization to a `before_action` callback.'
 
         RESTRICT_ON_SEND = %i[head render].freeze
@@ -44,11 +46,9 @@ module RuboCop
         AUTHORIZATION_STATUSES = %i[forbidden unauthorized].to_set.freeze
 
         def on_send(node)
-          return unless authorization_response?(node)
-          return unless in_public_method?(node)
-
-          add_offense(node)
+          add_offense(node) if authorization_response?(node) && in_public_method?(node)
         end
+        alias on_csend on_send
 
         private
 
@@ -56,9 +56,10 @@ module RuboCop
           case node.method_name
           when :head
             first_arg = node.first_argument
-            first_arg&.sym_type? && AUTHORIZATION_STATUSES.include?(first_arg.value)
+            first_arg && first_arg.sym_type? && AUTHORIZATION_STATUSES.include?(first_arg.value)
           when :render
-            status_value(node).then { |val| val&.sym_type? && AUTHORIZATION_STATUSES.include?(val.value) }
+            val = status_value(node)
+            val && val.sym_type? && AUTHORIZATION_STATUSES.include?(val.value)
           end
         end
 
@@ -76,37 +77,8 @@ module RuboCop
         end
 
         def in_public_method?(node)
-          method_node = node.each_ancestor(:def, :defs).first
-          return false unless method_node
-
-          !in_private_section?(method_node)
-        end
-
-        def in_private_section?(method_node)
-          return true if inline_visibility_modifier?(method_node)
-
-          effective_visibility(method_node) != :public
-        end
-
-        def inline_visibility_modifier?(node)
-          node.parent&.send_type? &&
-            %i[private protected].include?(node.parent.method_name)
-        end
-
-        def effective_visibility(node)
-          body = node.parent
-          return :public unless body&.begin_type?
-
-          body.children
-              .take_while { |child| !child.equal?(node) }
-              .select { |child| visibility_modifier?(child) }
-              .last&.method_name || :public
-        end
-
-        def visibility_modifier?(node)
-          node.send_type? &&
-            node.arguments.empty? &&
-            %i[private protected public].include?(node.method_name)
+          method_node = node.each_ancestor(:any_def).first
+          method_node && public_method?(method_node)
         end
       end
     end

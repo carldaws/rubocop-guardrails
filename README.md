@@ -1,8 +1,10 @@
 # rubocop-guardrails
 
-RuboCop cops that keep Rails apps on the golden path.
+RuboCop cops that make you stop and think.
 
-Rails is a convention-over-configuration framework, but it's easy to drift — especially when AI coding agents are involved. Agents pull from a broad training set and love to introduce service objects, decorators, form objects, and other patterns that aren't advocated for by the framework itself. These cops push back, keeping your app conventional: rich models, RESTful controllers, shallow jobs, and nothing in between.
+These cops aren't a style guide. They're friction in the right places. Each one flags a pattern where the easy thing to write is not the right thing to write — where reaching for a shortcut (`&.`, a guard clause, a non-RESTful action) lets you avoid naming what's actually going on. The fix is never mechanical: it's a conversation about intent.
+
+This matters especially when AI coding agents are involved. Agents pull from a broad training set and reach for defensive patterns — `&.` chains, service objects, guard clauses — without stopping to ask whether they're appropriate. These cops force that question. The agent (or the human) has to articulate *why* before the code can land.
 
 ## What it catches
 
@@ -138,7 +140,35 @@ end
 
 The list of allowed directories is configurable via `AllowedDirectories`.
 
-### Code style
+### Code clarity
+
+**NoNilSuppression** — bans `&.` and `try`/`try!`. Both silently swallow `nil`, hiding the question that matters: *can this actually be nil?* If it can't, drop the operator and let a `NoMethodError` tell you when your assumptions are wrong. If it can, that's a new concept — name it with an explicit conditional or a method that describes what the nil case means.
+
+```ruby
+# bad — can the reviewer be nil? Who knows
+pull_request.reviewer&.notify
+pull_request.reviewer.try(:notify)
+
+# good — if reviewer is required, let it raise
+pull_request.reviewer.notify
+
+# good — if reviewer is optional, name the business rule
+pull_request.notify_reviewer
+
+class PullRequest < ApplicationRecord
+  belongs_to :reviewer, optional: true
+
+  def review_required?
+    reviewer.present?
+  end
+
+  def notify_reviewer
+    reviewer.notify if review_required?
+  end
+end
+```
+
+The verbosity of an explicit conditional is the point. `&.` lets you skip the question; a named method forces you to answer it.
 
 **NoGuardClauses** — flags guard clauses (conditional early returns) at the beginning of methods. In short methods, prefer a conditional expression. Methods longer than `MinMethodLength` (default: 10) are allowed one guard clause.
 

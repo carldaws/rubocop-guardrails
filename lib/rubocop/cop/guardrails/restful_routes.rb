@@ -38,18 +38,17 @@ module RuboCop
         PATTERN
 
         def on_send(node)
-          return unless inside_routes_draw?(node)
-
-          if HTTP_VERBS.include?(node.method_name)
-            return if inside_member_or_collection?(node)
-
-            add_offense(node.loc.selector, message: MSG_VERB)
-          elsif node.method_name == :member
-            add_offense(node.loc.selector, message: MSG_MEMBER)
-          elsif node.method_name == :collection
-            add_offense(node.loc.selector, message: MSG_COLLECTION)
+          if inside_routes_draw?(node)
+            if HTTP_VERBS.include?(node.method_name)
+              add_offense(node.loc.selector, message: MSG_VERB) unless inside_member_or_collection?(node)
+            elsif node.method?(:member)
+              add_offense(node.loc.selector, message: MSG_MEMBER)
+            elsif node.method?(:collection)
+              add_offense(node.loc.selector, message: MSG_COLLECTION)
+            end
           end
         end
+        alias on_csend on_send
 
         private
 
@@ -59,7 +58,7 @@ module RuboCop
 
         def inside_member_or_collection?(node)
           node.each_ancestor(:block).any? do |block|
-            block.send_node.method_name == :member || block.send_node.method_name == :collection
+            block.method?(:member) || block.method?(:collection)
           end
         end
       end
