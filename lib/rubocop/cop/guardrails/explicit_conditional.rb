@@ -21,6 +21,7 @@ module RuboCop
         MSG_UNLESS = 'Use `nil?` instead of a bare truthiness check.'
 
         COMPARISON_OPERATORS = %i[== != < > <= >= <=> =~ !~ === !].to_set.freeze
+        BOOLEAN_METHODS = %i[save save! update update! destroy destroy! delete].to_set.freeze
         VARIABLE_TYPES = %i[lvar ivar cvar gvar].to_set.freeze
 
         def on_if(node)
@@ -45,7 +46,12 @@ module RuboCop
 
         def bare_send?(node)
           name = node.method_name
-          !name.end_with?('?') && !COMPARISON_OPERATORS.include?(name)
+
+          if name.end_with?('?') || COMPARISON_OPERATORS.include?(name) || BOOLEAN_METHODS.include?(name)
+            false
+          else
+            true
+          end
         end
       end
     end

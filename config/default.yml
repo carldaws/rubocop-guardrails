@@ -14,6 +14,8 @@ Guardrails/ControllerTransaction:
 Guardrails/ExplicitConditional:
   Enabled: true
   Description: 'Flags bare truthiness checks in conditionals.'
+  Exclude:
+    - 'config/**/*.rb'
 
 Guardrails/NoGuardClauses:
   Enabled: true

@@ -31,15 +31,6 @@ RSpec.describe RuboCop::Cop::Guardrails::ExplicitConditional, :config do
       RUBY
     end
 
-    it 'registers an offense for a chained method call' do
-      expect_offense(<<~RUBY)
-        if user.name
-           ^^^^^^^^^ Use a predicate method (e.g. `present?`) instead of a bare truthiness check.
-          do_something
-        end
-      RUBY
-    end
-
     it 'registers an offense for modifier if' do
       expect_offense(<<~RUBY)
         do_something if user
@@ -71,6 +62,72 @@ RSpec.describe RuboCop::Cop::Guardrails::ExplicitConditional, :config do
       expect_offense(<<~RUBY)
         do_something unless record
                             ^^^^^^ Use `nil?` instead of a bare truthiness check.
+      RUBY
+    end
+  end
+
+  context 'when the condition is a chained method call' do
+    it 'registers an offense for attribute access' do
+      expect_offense(<<~RUBY)
+        if user.name
+           ^^^^^^^^^ Use a predicate method (e.g. `present?`) instead of a bare truthiness check.
+          do_something
+        end
+      RUBY
+    end
+
+    it 'registers an offense for a class accessor' do
+      expect_offense(<<~RUBY)
+        Current.api_key.touch(:last_used_at) if Current.api_key
+                                                ^^^^^^^^^^^^^^^ Use a predicate method (e.g. `present?`) instead of a bare truthiness check.
+      RUBY
+    end
+
+    it 'registers an offense for hash access' do
+      expect_offense(<<~RUBY)
+        do_something if cookies.signed[:session_id]
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^ Use a predicate method (e.g. `present?`) instead of a bare truthiness check.
+      RUBY
+    end
+
+    it 'registers an offense for ENV lookup' do
+      expect_offense(<<~RUBY)
+        do_something if ENV["PIDFILE"]
+                        ^^^^^^^^^^^^^^ Use a predicate method (e.g. `present?`) instead of a bare truthiness check.
+      RUBY
+    end
+  end
+
+  context 'when the condition returns a boolean' do
+    it 'allows save' do
+      expect_no_offenses(<<~RUBY)
+        if @project.save
+          do_something
+        end
+      RUBY
+    end
+
+    it 'allows update' do
+      expect_no_offenses(<<~RUBY)
+        if @user.update(params)
+          do_something
+        end
+      RUBY
+    end
+
+    it 'allows destroy' do
+      expect_no_offenses(<<~RUBY)
+        if @record.destroy
+          do_something
+        end
+      RUBY
+    end
+
+    it 'allows delete' do
+      expect_no_offenses(<<~RUBY)
+        if @record.delete
+          do_something
+        end
       RUBY
     end
   end
