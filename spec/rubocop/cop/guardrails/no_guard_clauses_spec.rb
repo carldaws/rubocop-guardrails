@@ -129,6 +129,39 @@ RSpec.describe RuboCop::Cop::Guardrails::NoGuardClauses, :config do
     RUBY
   end
 
+  it 'registers an offense for a guard clause preceded by an assignment' do
+    expect_offense(<<~RUBY)
+      def something
+        result = compute
+        return if result.blank?
+        ^^^^^^^^^^^^^^^^^^^^^^^ Avoid guard clauses. Prefer a conditional expression.
+        result.do_something
+      end
+    RUBY
+  end
+
+  it 'sees through multiple assignments to find a guard clause' do
+    expect_offense(<<~RUBY)
+      def something
+        a = compute_a
+        b = compute_b(a)
+        return if b.nil?
+        ^^^^^^^^^^^^^^^^ Avoid guard clauses. Prefer a conditional expression.
+        process(b)
+      end
+    RUBY
+  end
+
+  it 'does not flag a guard after a non-assignment statement' do
+    expect_no_offenses(<<~RUBY)
+      def something
+        prepare
+        return if failed?
+        execute
+      end
+    RUBY
+  end
+
   it 'does not register an offense for empty methods' do
     expect_no_offenses(<<~RUBY)
       def something

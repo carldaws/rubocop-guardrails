@@ -58,7 +58,8 @@ module RuboCop
         def leading_guard_clauses(node)
           if node.body
             statements = node.body.begin_type? ? node.body.children : [node.body]
-            statements.take_while { |s| guard_clause?(s) }
+            preamble = statements.take_while { |s| guard_clause?(s) || s.lvasgn_type? }
+            preamble.select { |s| guard_clause?(s) }
           else
             []
           end
