@@ -11,6 +11,10 @@ Guardrails/ControllerTransaction:
   Include:
     - 'app/controllers/**/*.rb'
 
+Guardrails/ExplicitConditional:
+  Enabled: true
+  Description: 'Flags bare truthiness checks in conditionals.'
+
 Guardrails/NoGuardClauses:
   Enabled: true
   Description: 'Discourages guard clauses (conditional early returns).'

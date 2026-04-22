@@ -3,6 +3,7 @@
 require_relative 'guardrails/visibility_helpers'
 require_relative 'guardrails/controller_instance_variables'
 require_relative 'guardrails/controller_transaction'
+require_relative 'guardrails/explicit_conditional'
 require_relative 'guardrails/no_guard_clauses'
 require_relative 'guardrails/no_inline_authorization'
 require_relative 'guardrails/no_nil_suppression'

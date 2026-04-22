@@ -9,7 +9,7 @@ module RuboCop
       # that matters: can this actually be nil? If it can't, drop
       # the operator and let a `NoMethodError` surface the real bug.
       # If it can, that's a concept worth naming — use an explicit
-      # conditional or a method that describes what the nil case means.
+      # predicate or a method that describes what the nil case means.
       #
       # @example
       #   # bad
@@ -19,14 +19,17 @@ module RuboCop
       #   # good — if reviewer is required, let it raise
       #   pull_request.reviewer.notify
       #
+      #   # good — if reviewer is optional, check explicitly
+      #   pull_request.reviewer.notify if pull_request.reviewer.present?
+      #
       #   # good — if reviewer is optional, name the business rule
       #   pull_request.notify_reviewer
       class NoNilSuppression < Base
         MSG_SAFE_NAV = 'Do not use safe navigation (`&.`). ' \
-                       'If `nil` is actually expected, handle it with an explicit conditional.'
+                       'If `nil` is expected, use an explicit predicate (e.g. `present?`, `nil?`).'
 
         MSG_TRY = 'Do not use `%<method>s`. ' \
-                  'If `nil` is actually expected, handle it with an explicit conditional.'
+                  'If `nil` is expected, use an explicit predicate (e.g. `present?`, `nil?`).'
 
         def on_csend(node)
           add_offense(node, message: MSG_SAFE_NAV)

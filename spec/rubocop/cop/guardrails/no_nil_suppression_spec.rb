@@ -53,7 +53,7 @@ RSpec.describe RuboCop::Cop::Guardrails::NoNilSuppression, :config do
 
   it 'does not register an offense for an explicit conditional' do
     expect_no_offenses(<<~RUBY)
-      user.name if user
+      user.name if user.present?
     RUBY
   end
 end

@@ -45,10 +45,10 @@ module RuboCop
         private
 
         def statement_count(node)
-          if node.body
-            node.body.begin_type? ? node.body.children.size : 1
-          else
+          if node.body.nil?
             0
+          else
+            node.body.begin_type? ? node.body.children.size : 1
           end
         end
 

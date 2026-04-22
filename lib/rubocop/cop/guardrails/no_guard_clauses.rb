@@ -23,12 +23,12 @@ module RuboCop
       #
       #   # good — use a conditional expression
       #   def something
-      #     thing.do_something if thing
+      #     thing.do_something if thing.present?
       #   end
       #
       #   # good — use an expanded conditional
       #   def something
-      #     if thing
+      #     unless thing.nil?
       #       thing.do_something
       #     end
       #   end
@@ -56,12 +56,12 @@ module RuboCop
         private
 
         def leading_guard_clauses(node)
-          if node.body
+          if node.body.nil?
+            []
+          else
             statements = node.body.begin_type? ? node.body.children : [node.body]
             preamble = statements.take_while { |s| guard_clause?(s) || s.lvasgn_type? }
             preamble.select { |s| guard_clause?(s) }
-          else
-            []
           end
         end
 
