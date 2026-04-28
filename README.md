@@ -170,6 +170,18 @@ end
 
 The verbosity of an explicit conditional is the point. `&.` lets you skip the question; a named method forces you to answer it.
 
+**ExplicitConditional** — flags conditionals that rely on bare truthiness instead of an explicit predicate. `if user` hides the real question: are you checking for nil, blank, empty, or something else? Pick the predicate that says what you mean.
+
+```ruby
+# bad — what does "if user" actually mean?
+do_something if user
+return unless account
+
+# good — say what you mean
+do_something if user.present?
+return unless account.nil?
+```
+
 **NoGuardClauses** — flags guard clauses (conditional early returns) at the beginning of methods. In short methods, prefer a conditional expression. Methods longer than `MinMethodLength` (default: 10) are allowed one guard clause.
 
 ```ruby
